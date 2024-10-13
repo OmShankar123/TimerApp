@@ -6,12 +6,11 @@ import { colors } from '../theme/colors';
 import { PieChart as GiftedPieChart } from 'react-native-gifted-charts';
 
 const Timer = ({ duration, onRemove, label, onComplete }) => {
-  const { time, start, pause, reset } = useTimer(duration, () => {
-    Alert.alert("Timer Finished", `Timer "${label}" finished.`);
+  const { time, start, pause, reset, isActive } = useTimer(duration, () => {
+    Alert.alert("Timer Finished", `Timer "${label}" finished. Initial Time: ${formatTime(duration)}`);
     onComplete(duration);
   });
 
-  // Calculate pie chart data
   const data = [
     { value: time, color: colors.primary, label: 'Remaining' },
     { value: duration - time, color: colors.secondary, label: 'Elapsed' },
@@ -22,14 +21,8 @@ const Timer = ({ duration, onRemove, label, onComplete }) => {
       "Delete Timer",
       `Are you sure you want to delete the timer "${label}"?`,
       [
-        {
-          text: "Cancel",
-          style: "cancel"
-        },
-        {
-          text: "OK",
-          onPress: onRemove
-        }
+        { text: "Cancel", style: "cancel" },
+        { text: "OK", onPress: onRemove }
       ]
     );
   };
@@ -38,16 +31,15 @@ const Timer = ({ duration, onRemove, label, onComplete }) => {
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <Text style={styles.initialTime}>{`Initial Time: ${formatTime(duration)}`}</Text>
-      {/* <Text style={styles.remainingTime}>{`Remaining Time: ${formatTime(time)}`}</Text> */}
 
       <View style={styles.chartContainer}>
         <GiftedPieChart
           data={data}
           donut
           showGradient
-          radius={60} // Adjust size as needed
-          innerRadius={45} // Inner radius for donut effect
-          innerCircleColor={'#232B5D'} // Inner circle color
+          radius={60}
+          innerRadius={45}
+          innerCircleColor={'#232B5D'}
           centerLabelComponent={() => (
             <View style={styles.centerLabel}>
               <Text style={styles.centerLabelText}>{`${formatTime(time)}`}</Text>
@@ -58,11 +50,8 @@ const Timer = ({ duration, onRemove, label, onComplete }) => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={start}>
-          <Icon name="play" size={20} color={colors.text} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={pause}>
-          <Icon name="pause" size={20} color={colors.text} />
+        <TouchableOpacity style={styles.button} onPress={isActive ? pause : start}>
+          <Icon name={isActive ? "pause" : "play"} size={20} color={colors.text} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={reset}>
           <Icon name="refresh" size={20} color={colors.text} />
@@ -103,12 +92,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 14,
     marginBottom: 5,
-  },
-  remainingTime: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
   },
   chartContainer: {
     marginVertical: 20,

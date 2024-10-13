@@ -4,7 +4,7 @@ import Timer from '../components/Timer';
 import { colors } from '../theme/colors';
 import { useNavigation } from '@react-navigation/native';
 import storageService from '../storage/storageService'; 
-import Icon from 'react-native-vector-icons/Ionicons'; // Importing the icon library
+import Icon from 'react-native-vector-icons/Ionicons'; 
 
 const MAX_TIMERS = 5;
 
@@ -17,6 +17,7 @@ const HomeScreen = () => {
   const [timerLabels, setTimerLabels] = useState(Array(MAX_TIMERS).fill(''));
   const [currentLabel, setCurrentLabel] = useState('');
   const [timerHistory, setTimerHistory] = useState([]);
+  const [userName, setUserName] = useState(''); 
 
   useEffect(() => {
     const loadTimers = async () => {
@@ -39,6 +40,17 @@ const HomeScreen = () => {
 
     storeTimers();
   }, [timers, timerLabels, timerHistory]);
+
+  useEffect(() => {
+    const loadUserName = async () => {
+      const nameFromStorage = await storageService.loadUserName();
+      if (nameFromStorage) {
+        setUserName(nameFromStorage);
+      }
+    };
+
+    loadUserName();
+  }, []);
 
   const addTimer = (totalTime, label) => {
     const updatedTimers = [...timers];
@@ -96,7 +108,7 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Enter Timer Duration:</Text>
+        <Text style={styles.title}>Hi, {userName ? `${userName}!` : 'there!'}</Text>
         <TouchableOpacity
           style={styles.historyButton}
           onPress={() => navigation.navigate('History', { timerHistory })}
@@ -129,21 +141,24 @@ const HomeScreen = () => {
           style={styles.input}
           placeholderTextColor={colors.placeholder}
         />
-      </View>
-      <TextInput
-        placeholder="Timer Label"
+         <TextInput
+        placeholder="Label"
         value={currentLabel}
         onChangeText={setCurrentLabel}
         style={styles.input}
         placeholderTextColor={colors.placeholder}
       />
+      </View>
+     
       
       <TouchableOpacity style={styles.addButton} onPress={handleInputSubmit}>
         <Icon name="timer-outline" size={24} color={colors.text} /> 
         <Text style={styles.addButtonText}>Add Timer</Text>
       </TouchableOpacity>
 
-      <ScrollView style={styles.timerList}>
+      <ScrollView 
+       showsVerticalScrollIndicator={false}
+      style={styles.timerList}>
         {timers.map((duration, index) => {
           return duration ? (
             <Timer
@@ -187,7 +202,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     padding: 15,
-    width: '30%',
+    width: '24%',
     borderColor: colors.secondary,
     backgroundColor: colors.surface,
     color: colors.text,
@@ -216,7 +231,7 @@ const styles = StyleSheet.create({
   },
   historyButton: {
     padding: 10,
-    bottom:10
+    bottom: 10,
   },
   timerList: {
     marginTop: 10,

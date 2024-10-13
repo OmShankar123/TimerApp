@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const STORAGE_KEYS = {
   TIMERS: 'timers',
   TIMER_HISTORY: 'timerHistory',
+  USER_NAME: 'userName',
 };
 
 const storageService = {
@@ -26,6 +27,16 @@ const storageService = {
     }
   },
 
+  async loadUserName() {
+    try {
+      const userName = await AsyncStorage.getItem(STORAGE_KEYS.USER_NAME);
+      return userName || '';
+    } catch (error) {
+      console.error('Failed to load user name:', error);
+      return ''; // Default value
+    }
+  },
+
   async saveTimers(timersData) {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.TIMERS, JSON.stringify(timersData));
@@ -39,6 +50,14 @@ const storageService = {
       await AsyncStorage.setItem(STORAGE_KEYS.TIMER_HISTORY, JSON.stringify(timerHistory));
     } catch (error) {
       console.error('Failed to save timer history:', error);
+    }
+  },
+
+  async saveUserName(userName) {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.USER_NAME, userName);
+    } catch (error) {
+      console.error('Failed to save user name:', error);
     }
   },
 };

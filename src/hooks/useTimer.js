@@ -13,7 +13,7 @@ const useTimer = (initialTime, onComplete) => {
           if (prevTime <= 1) {
             clearInterval(interval);
             if (onComplete) {
-              onComplete(formatTime(0)); // Notify parent about the completion with formatted time
+              onComplete(formatTime(initialTime)); // Notify parent with the initial formatted time
             }
             return 0; // Stop the timer
           }
@@ -25,7 +25,7 @@ const useTimer = (initialTime, onComplete) => {
     }
 
     return () => clearInterval(interval); // Clean up the interval on unmount
-  }, [isActive, time, onComplete]);
+  }, [isActive, time, onComplete, initialTime]);
 
   const start = () => setIsActive(true);
   const pause = () => setIsActive(false);
@@ -34,7 +34,7 @@ const useTimer = (initialTime, onComplete) => {
     setTime(initialTime);
   };
 
-  return { time, start, pause, reset };
+  return { time, start, pause, reset, isActive }; // Return isActive to allow button logic
 };
 
 // Helper function to format time
